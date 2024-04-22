@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "react": "18.2.0",
-    "react-native": "0.73.6"
+    "react-native": "0.73.6",
+    "react-native-shared-group-preferences": "^1.1.24",
+    "react-native-widget-center": "^0.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

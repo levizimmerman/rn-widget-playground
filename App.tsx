@@ -1,118 +1,64 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
+  NativeModules,
+  Button,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
   Text,
-  useColorScheme,
-  View,
+  TextInput,
+  ToastAndroid,
+  Platform,
 } from 'react-native';
+import SharedGroupPreferences from 'react-native-shared-group-preferences';
+import RNWidgetCenter from 'react-native-widget-center';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const group = 'group.streak';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+const SharedStorage = NativeModules.SharedStorage;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+const App: React.FC = () => {
+  const [text, setText] = React.useState('');
+  const widgetData = {
+    text,
   };
 
+  const handleSubmit = async () => {
+    if (Platform.OS === 'ios') {
+      try {
+        await SharedGroupPreferences.setItem('widgetKey', widgetData, group);
+        RNWidgetCenter.reloadTimelines('StreakWidget');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    if (Platform.OS === 'android') {
+      const value = `${text} days`;
+      SharedStorage.set(JSON.stringify({text: value}));
+      ToastAndroid.show('Widget value updated', ToastAndroid.SHORT);
+    }
+  };
+
+  React.useEffect(() => {
+    SharedGroupPreferences.getItem('widgetKey', group).then(data => {
+      try {
+        const parsed = JSON.parse(data);
+        setText(parsed.text);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }, []);
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <SafeAreaView>
+      <Text>Change Widget Value</Text>
+      <TextInput
+        onChangeText={setText}
+        value={text}
+        placeholder="Enter the text to display"
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+      <Button title="Submit" onPress={handleSubmit} />
     </SafeAreaView>
   );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+};
 
 export default App;
