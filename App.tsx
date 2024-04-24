@@ -31,8 +31,7 @@ const App: React.FC = () => {
       }
     }
     if (Platform.OS === 'android') {
-      const value = `${text} days`;
-      SharedStorage.set(JSON.stringify({text: value}));
+      SharedStorage.set(JSON.stringify({text}));
       ToastAndroid.show('Widget value updated', ToastAndroid.SHORT);
     }
   };
