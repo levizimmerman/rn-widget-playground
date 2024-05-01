@@ -1,8 +1,8 @@
 //
 //  AppIntent.swift
-//  StreakWidget
+//  ExampleWidget
 //
-//  Created by Levi Zimmerman on 17/04/2024.
+//  Created by Levi Zimmerman on 29/04/2024.
 //
 
 import WidgetKit
@@ -13,8 +13,6 @@ struct ConfigurationAppIntent: WidgetConfigurationIntent {
     static var description = IntentDescription("This is an example widget.")
 
     // An example configurable parameter.
-    @Parameter(title: "Test input", default: "Some text")
-    var text: String
-    @Parameter(title: "Second input", default: "Something")
-    var favoriteText: String
+    @Parameter(title: "Test", default: "😃")
+    var favoriteEmoji: String
 }

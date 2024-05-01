@@ -18,15 +18,16 @@ struct Provider: AppIntentTimelineProvider {
   typealias Intent = ConfigurationAppIntent
   
   func placeholder(in context: Context) -> SimpleEntry {
-    SimpleEntry(date: Date(), configuration: ConfigurationAppIntent(), text: "Placeholder")
+    SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
   }
   
   func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-    return SimpleEntry(date: Date(), configuration: configuration, text: "Data goes here")
+    SimpleEntry(date: Date(), configuration: configuration)
   }
   
   func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
     let userDefaults = UserDefaults.init(suiteName: "group.streak")
+
     if userDefaults != nil {
       let entryDate = Date()
       if let savedDate = userDefaults!.value(forKey: "widgetKey") as? String {
@@ -34,14 +35,16 @@ struct Provider: AppIntentTimelineProvider {
         let data = savedDate.data(using: .utf8)
         if let parsedData = try? decoder.decode(WidgetData.self, from: data!) {
           let nextRefresh = Calendar.current.date(byAdding: .second, value: 5, to: entryDate)!
-          let entry = SimpleEntry(date: nextRefresh, configuration: configuration, text: parsedData.text)
+//          configuration.text = parsedData.text
+          let entry = SimpleEntry(date: nextRefresh, configuration: configuration)
           return Timeline(entries: [entry], policy: .atEnd)
         } else {
           print("Could not parse data")
         }
       } else {
         let nextRefresh = Calendar.current.date(byAdding: .second, value: 5, to: entryDate)!
-        let entry = SimpleEntry(date: nextRefresh, configuration: configuration, text: "No data set")
+        configuration.text = "No data set"
+        let entry = SimpleEntry(date: nextRefresh, configuration: configuration)
         return Timeline(entries: [entry], policy: .atEnd)
       }
     }
@@ -52,38 +55,7 @@ struct Provider: AppIntentTimelineProvider {
 struct SimpleEntry: TimelineEntry {
   let date: Date
   let configuration: ConfigurationAppIntent
-  let text: String
 }
-
-//
-//struct Provider: AppIntentTimelineProvider {
-//    func placeholder(in context: Context) -> SimpleEntry {
-//        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
-//    }
-//
-//    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
-//        SimpleEntry(date: Date(), configuration: configuration)
-//    }
-//    
-//    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
-//        var entries: [SimpleEntry] = []
-//
-//        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
-//        let currentDate = Date()
-//        for hourOffset in 0 ..< 5 {
-//            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-//            let entry = SimpleEntry(date: entryDate, configuration: configuration)
-//            entries.append(entry)
-//        }
-//
-//        return Timeline(entries: entries, policy: .atEnd)
-//    }
-//}
-
-//struct SimpleEntry: TimelineEntry {
-//    let date: Date
-//    let configuration: ConfigurationAppIntent
-//}
 
 struct StreakWidgetEntryView : View {
   var entry: Provider.Entry
@@ -92,7 +64,7 @@ struct StreakWidgetEntryView : View {
     HStack {
       VStack(alignment: .leading, spacing: 0) {
         HStack(alignment: /*@START_MENU_TOKEN@*/.center/*@END_MENU_TOKEN@*/) {
-          Text(entry.text)
+          Text(entry.configuration.text)
             .foregroundColor(Color(red: 1.00, green: 0.59, blue: 0.00))
             .font(Font.system(size: 21, weight: .bold, design: .rounded))
             .padding(.leading, -8.0)
@@ -124,22 +96,24 @@ struct StreakWidget: Widget {
 }
 
 extension ConfigurationAppIntent {
-    fileprivate static var smiley: ConfigurationAppIntent {
+    fileprivate static var firstEntry: ConfigurationAppIntent {
         let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "😀"
+        intent.text = "This is the first input"
         return intent
     }
     
-    fileprivate static var starEyes: ConfigurationAppIntent {
+    fileprivate static var secondEntry: ConfigurationAppIntent {
         let intent = ConfigurationAppIntent()
-        intent.favoriteEmoji = "🤩"
+        intent.text = "This is second input"
         return intent
     }
 }
 
+// Setup to preview the widget in Xcode.
 #Preview(as: .systemSmall) {
-    StreakWidget()
+  StreakWidget()
 } timeline: {
-  SimpleEntry(date: .now, configuration: .smiley, text: "This is the first entry")
-  SimpleEntry(date: .now, configuration: .starEyes, text: "This is the second entry")
+  // Add a list of entries to play in the preview.
+  SimpleEntry(date: .now, configuration: .firstEntry)
+  SimpleEntry(date: .now, configuration: .secondEntry)
 }
