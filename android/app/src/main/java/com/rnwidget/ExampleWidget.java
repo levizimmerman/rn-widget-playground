@@ -19,9 +19,11 @@ public class ExampleWidget extends AppWidgetProvider {
 
         try {
             SharedPreferences sharedPref = context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
+            // Note we use "favoriteEmoji" as the key to store the data in appData object. You should change this to a data structure that fits your needs
             String appString = sharedPref.getString("appData", "{\"favoriteEmoji\": 'no data'}");
             JSONObject appData = new JSONObject(appString);
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.example_widget);
+            // Update the view with the data from the shared storage
             views.setTextViewText(R.id.appwidget_text, appData.getString("favoriteEmoji"));
             appWidgetManager.updateAppWidget(appWidgetId, views);
         } catch (JSONException e) {

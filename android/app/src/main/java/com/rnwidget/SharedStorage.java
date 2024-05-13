@@ -31,6 +31,7 @@ public class SharedStorage extends ReactContextBaseJavaModule {
     @ReactMethod
     public void set(String message) {
         SharedPreferences.Editor editor = context.getSharedPreferences("DATA", Context.MODE_PRIVATE).edit();
+        // "appData" is just an arbitrary key we use
         editor.putString("appData", message);
         editor.commit();
 
@@ -38,6 +39,7 @@ public class SharedStorage extends ReactContextBaseJavaModule {
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         int[] ids = AppWidgetManager.getInstance(getCurrentActivity().getApplicationContext()).getAppWidgetIds(new ComponentName(getCurrentActivity().getApplicationContext(), ExampleWidget.class));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        // we use ExampleWidget.class to trigger an update for the widget after setting new data
         getCurrentActivity().getApplicationContext().sendBroadcast(intent);
     }
 
