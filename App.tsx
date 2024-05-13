@@ -1,63 +1,58 @@
 import React from 'react';
-import {
-  NativeModules,
-  Button,
-  SafeAreaView,
-  Text,
-  TextInput,
-  ToastAndroid,
-  Platform,
-} from 'react-native';
-import SharedGroupPreferences from 'react-native-shared-group-preferences';
-import RNWidgetCenter from 'react-native-widget-center';
+import {Button, SafeAreaView, TextInput, StyleSheet} from 'react-native';
+import WidgetStorageClient from './src/utils/widget-storage.android';
 
-const group = 'group.streak';
-
-const SharedStorage = NativeModules.SharedStorage;
+const WidgetStorage = new WidgetStorageClient<{favoriteEmoji: string}>({
+  kind: 'ExampleWidget',
+  group: 'group.example',
+  key: 'widgetKey',
+});
 
 const App: React.FC = () => {
-  const [text, setText] = React.useState('');
+  const [favoriteEmoji, setFavoriteEmoji] = React.useState('');
   const widgetData = {
-    text,
+    favoriteEmoji,
   };
 
   const handleSubmit = async () => {
-    if (Platform.OS === 'ios') {
-      try {
-        await SharedGroupPreferences.setItem('widgetKey', widgetData, group);
-        RNWidgetCenter.reloadTimelines('StreakWidget');
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    if (Platform.OS === 'android') {
-      SharedStorage.set(JSON.stringify({text}));
-      ToastAndroid.show('Widget value updated', ToastAndroid.SHORT);
-    }
+    WidgetStorage.saveData(widgetData);
+  };
+
+  const removeEmoji = async () => {
+    setFavoriteEmoji('');
+    WidgetStorage.saveData({favoriteEmoji: ''});
   };
 
   React.useEffect(() => {
-    SharedGroupPreferences.getItem('widgetKey', group).then(data => {
-      try {
-        const parsed = JSON.parse(data);
-        setText(parsed.text);
-      } catch (error) {
-        console.error(error);
-      }
-    });
+    (async () => {
+      const data = await WidgetStorage.getData();
+      setFavoriteEmoji(data.favoriteEmoji ?? '');
+    })();
   }, []);
 
   return (
-    <SafeAreaView>
-      <Text>Change Widget Value</Text>
+    <SafeAreaView style={styles.container}>
       <TextInput
-        onChangeText={setText}
-        value={text}
-        placeholder="Enter the text to display"
+        onChangeText={setFavoriteEmoji}
+        value={favoriteEmoji}
+        placeholder="Pick your favorite emoji"
+        style={styles.input}
       />
-      <Button title="Submit" onPress={handleSubmit} />
+      <Button title="Save emoji" onPress={handleSubmit} />
+      <Button title="Remove emoji" onPress={removeEmoji} color="red" />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  input: {
+    fontSize: 32,
+    marginVertical: 16,
+  },
+});
 
 export default App;
