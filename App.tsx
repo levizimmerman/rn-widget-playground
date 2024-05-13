@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, SafeAreaView, TextInput, StyleSheet} from 'react-native';
+import {Button, SafeAreaView, TextInput, StyleSheet, View} from 'react-native';
 import WidgetStorageClient from './src/utils/widget-storage';
 
 const WidgetStorage = new WidgetStorageClient<{favoriteEmoji: string}>({
@@ -39,6 +39,7 @@ const App: React.FC = () => {
         style={styles.input}
       />
       <Button title="Save emoji" onPress={handleSubmit} />
+      <View style={styles.spacer} />
       <Button title="Remove emoji" onPress={removeEmoji} color="red" />
     </SafeAreaView>
   );
@@ -52,6 +53,9 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 32,
     marginVertical: 16,
+  },
+  spacer: {
+    marginVertical: 8,
   },
 });
 
