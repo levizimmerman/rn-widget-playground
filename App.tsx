@@ -26,7 +26,7 @@ const App: React.FC = () => {
   React.useEffect(() => {
     (async () => {
       const data = await WidgetStorage.getData();
-      setFavoriteEmoji(data.favoriteEmoji ?? '');
+      setFavoriteEmoji(data?.favoriteEmoji ?? '');
     })();
   }, []);
 
