@@ -8,7 +8,7 @@ type Config = {
   key: string;
 };
 
-class WidgetStorage<DataType> {
+class WidgetStorage<DataType = Record<string, any>> {
   config: Config;
 
   constructor(config: Config) {

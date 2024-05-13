@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button, SafeAreaView, TextInput, StyleSheet} from 'react-native';
-import WidgetStorageClient from './src/utils/widget-storage.android';
+import WidgetStorageClient from './src/utils/widget-storage';
 
 const WidgetStorage = new WidgetStorageClient<{favoriteEmoji: string}>({
   kind: 'ExampleWidget',
