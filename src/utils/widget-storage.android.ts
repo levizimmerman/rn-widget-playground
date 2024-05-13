@@ -20,8 +20,16 @@ class WidgetStorage<DataType = Record<string, any>> {
     ToastAndroid.show('Widget value updated', ToastAndroid.SHORT);
   }
 
-  async getData(): Promise<DataType> {
-    return {} as DataType;
+  async getData(): Promise<DataType | null> {
+    const data = await SharedStorage.get();
+
+    try {
+      const parsed = JSON.parse(data);
+      return parsed;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
   }
 }
 

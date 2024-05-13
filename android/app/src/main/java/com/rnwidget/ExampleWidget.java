@@ -21,7 +21,7 @@ public class ExampleWidget extends AppWidgetProvider {
             SharedPreferences sharedPref = context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
             String appString = sharedPref.getString("appData", "{\"favoriteEmoji\": 'no data'}");
             JSONObject appData = new JSONObject(appString);
-            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.streak_widget);
+            RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.example_widget);
             views.setTextViewText(R.id.appwidget_text, appData.getString("favoriteEmoji"));
             appWidgetManager.updateAppWidget(appWidgetId, views);
         } catch (JSONException e) {

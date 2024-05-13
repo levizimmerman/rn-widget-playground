@@ -1,6 +1,7 @@
 package com.rnwidget;
 
 import com.facebook.react.bridge.NativeModule;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -38,5 +39,16 @@ public class SharedStorage extends ReactContextBaseJavaModule {
         int[] ids = AppWidgetManager.getInstance(getCurrentActivity().getApplicationContext()).getAppWidgetIds(new ComponentName(getCurrentActivity().getApplicationContext(), ExampleWidget.class));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         getCurrentActivity().getApplicationContext().sendBroadcast(intent);
+    }
+
+    @ReactMethod
+    public void get(Promise promise) {
+        SharedPreferences prefs = context.getSharedPreferences("DATA", Context.MODE_PRIVATE);
+        String value = prefs.getString("appData", null);
+        if (value != null) {
+            promise.resolve(value);
+        } else {
+            promise.reject("No value", "No value found for key");
+        }
     }
 }
